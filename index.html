@@ -108,11 +108,18 @@ body {
 .day-sub {
   font-size: 14px;
   color: var(--muted);
-  margin-bottom: 1.5rem;
+  margin-bottom: 6px;
   font-family: 'DM Mono', monospace;
   letter-spacing: 0.03em;
 }
 .day-sub b { color: var(--text); font-weight: 500; }
+.day-date {
+  font-size: 13px;
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
+}
 
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn-primary {
@@ -214,18 +221,43 @@ body {
 }
 .dot-grid {
   display: grid;
-  grid-template-columns: repeat(25, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 5px;
 }
 .dot {
-  aspect-ratio: 1;
-  border-radius: 3px;
+  border-radius: 4px;
   background: var(--navy3);
   border: 1px solid var(--border);
   cursor: pointer;
   transition: transform 0.1s, background 0.15s;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  min-height: 54px;
 }
+.dot-day-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: #FFFFFF;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.dot.done .dot-day-num { color: #FFFFFF; }
+.dot.active .dot-day-num { color: #FFFFFF; }
+.dot-day-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #FFFFFF;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0.85;
+}
+.dot.done .dot-day-date { color: #FFFFFF; opacity: 0.9; }
+.dot.active .dot-day-date { color: #FFFFFF; opacity: 1; }
 .dot:hover { transform: scale(1.3); z-index: 10; }
 .dot.done { background: var(--green); border-color: var(--green2); }
 .dot.partial { background: var(--amber); border-color: #F0B030; opacity: 0.7; }
@@ -257,7 +289,7 @@ body {
 @media (max-width: 820px) {
   .main-layout { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
-  .dot-grid { grid-template-columns: repeat(20,1fr); }
+  .dot-grid { grid-template-columns: repeat(10,1fr); }
 }
 
 /* ── TASK GROUPS ── */
@@ -462,6 +494,37 @@ body {
 .dco-sub { font-size: 14px; color: var(--muted); margin-bottom: 2rem; }
 .dco-next { font-size: 13px; color: var(--text); }
 
+/* ── REFERENCE DOCS ── */
+.ref-section {
+  max-width: 1100px; margin: 0 auto 3rem; padding: 0 2rem;
+}
+.ref-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 12px;
+}
+.ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 680px) { .ref-grid { grid-template-columns: 1fr; } }
+.ref-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+  display: flex; align-items: flex-start; gap: 14px;
+  border-left: 3px solid var(--gold);
+}
+.ref-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+.ref-info { flex: 1; }
+.ref-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.ref-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 6px; }
+.ref-meta { font-size: 11px; color: var(--gold); font-family: 'DM Mono', monospace; }
+.ref-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.ref-btn {
+  padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+  text-decoration: none; text-align: center; cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.ref-btn:hover { opacity: 0.8; }
+.ref-btn.view { background: var(--gold); color: var(--navy); }
+.ref-btn.dl { background: var(--navy3); color: var(--text); border: 1px solid var(--border); }
+
 /* scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--navy); }
@@ -487,6 +550,7 @@ body {
       <div class="phase-pill phase-1" id="hero-phase-pill">● Phase 1 — Foundation</div>
       <div class="day-headline">DAY <span id="hero-day">1</span></div>
       <div class="day-sub" id="hero-session">Loading...</div>
+      <div class="day-date" id="hero-date"></div>
     </div>
   </div>
 </section>
@@ -593,6 +657,7 @@ body {
         <div class="phase-row"><span class="phase-row-label">Focus</span><span class="phase-row-val" id="pi-focus">Foundation</span></div>
         <div class="phase-row"><span class="phase-row-label">Session</span><span class="phase-row-val" id="pi-session">—</span></div>
         <div class="phase-row"><span class="phase-row-label">Day in phase</span><span class="phase-row-val" id="pi-dayinphase">1</span></div>
+        <div class="phase-row"><span class="phase-row-label">Date</span><span class="phase-row-val" id="pi-date" style="font-size:11px;"></span></div>
       </div>
     </div>
 
@@ -602,6 +667,39 @@ body {
       <div class="mantra-sub">The physique changes first. Then the identity changes.</div>
     </div>
 
+  </div>
+</div>
+
+<!-- REFERENCE DOCS -->
+<div class="ref-section">
+  <div class="ref-inner">
+    <div class="ref-label">Reference Documents</div>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="ref-icon">📘</div>
+        <div class="ref-info">
+          <div class="ref-title">100-Day Transformation OS</div>
+          <div class="ref-desc">Complete operating system — workouts, nutrition, supplements, skincare, career, finance &amp; identity</div>
+          <div class="ref-meta">34 sections · Full protocol</div>
+        </div>
+        <div class="ref-actions">
+          <a class="ref-btn view" href="Balaji_100_Day_Transformation_OS.pdf" target="_blank">View</a>
+          <a class="ref-btn dl" href="Balaji_100_Day_Transformation_OS.pdf" download>Download</a>
+        </div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-icon">📗</div>
+        <div class="ref-info">
+          <div class="ref-title">90-Day Aesthetic Transformation</div>
+          <div class="ref-desc">Detailed fat loss protocol — meal breakdowns, macros, workout splits, skincare &amp; recovery</div>
+          <div class="ref-meta">21 sections · Aesthetic focus</div>
+        </div>
+        <div class="ref-actions">
+          <a class="ref-btn view" href="Balaji_90Day_Transformation.pdf" target="_blank">View</a>
+          <a class="ref-btn dl" href="Balaji_90Day_Transformation.pdf" download>Download</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -643,7 +741,8 @@ const TASKS = [
     { id: "water4",  label: "4 litres water total",                time: "Throughout day" },
   ]},
   { group: "Evening Wind-Down", icon: "evening", emoji: "🌙", items: [
-    { id: "skinp",   label: "Night skincare — cleanser + niacinamide + moisturizer", time: "10:50 PM" },
+    { id: "reading", label: "Read 10 min — Fitness / Communication / Finance / Career", time: "10:35 PM" },
+    { id: "skinp",   label: "Night skincare — cleanser + niacinamide + moisturizer", time: "10:45 PM" },
     { id: "suppn",   label: "Ashwagandha + Fish Oil",              time: "10:50 PM" },
     { id: "sleep",   label: "Phone away, sleep by 11:00 PM",       time: "11:00 PM" },
   ]},
@@ -658,6 +757,31 @@ const PHASES = [
 
 function getPhase(d) { return PHASES.find(p => d>=p.range[0] && d<=p.range[1])||PHASES[3]; }
 function getSession(d) { const p=getPhase(d); return p.session[(d-1)%7]; }
+
+const START_DATE = new Date('2026-06-15T00:00:00');
+function getDate(d) {
+  const dt = new Date(START_DATE);
+  dt.setDate(dt.getDate() + (d - 1));
+  return dt;
+}
+function formatDate(d) {
+  const dt = getDate(d);
+  return dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+function formatDateShort(d) {
+  const dt = getDate(d);
+  return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+function getTodayDay() {
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  const start = new Date(START_DATE);
+  start.setHours(0,0,0,0);
+  const diff = Math.floor((now - start) / 86400000) + 1;
+  if(diff < 1) return 1;
+  if(diff > 100) return 100;
+  return diff;
+}
 function allTaskIds() { return TASKS.flatMap(g=>g.items.map(i=>i.id)); }
 
 function stateKey(d,tid) { return 'd'+d+'_'+tid; }
@@ -669,7 +793,7 @@ let currentDay = 1;
 function loadState() {
   try { state = JSON.parse(localStorage.getItem('balaji100') || '{}'); }
   catch(e) { state = {}; }
-  currentDay = parseInt(state._currentDay || 1);
+  currentDay = parseInt(state._currentDay || getTodayDay());
 }
 function saveState() {
   state._currentDay = currentDay;
@@ -750,7 +874,7 @@ function buildSelect() {
   sel.innerHTML='';
   for(let d=1;d<=100;d++) {
     const o=document.createElement('option');
-    o.value=d; o.textContent='Day '+d+' — '+getSession(d);
+    o.value=d; o.textContent='Day '+d+' · '+formatDateShort(d)+' — '+getSession(d);
     sel.appendChild(o);
   }
 }
@@ -773,6 +897,7 @@ function render() {
   // Hero
   document.getElementById('hero-day').textContent = d;
   document.getElementById('hero-session').textContent = session;
+  document.getElementById('hero-date').textContent = formatDate(d);
   const heroPill = document.getElementById('hero-phase-pill');
   heroPill.textContent = '● '+phase.label+' — '+phase.name;
   heroPill.className = 'phase-pill '+phase.cls;
@@ -802,9 +927,21 @@ function render() {
     if(i>d && !state[dayKey(i)]) cls+=' future';
     dt.className=cls;
     dt.onclick=(()=>{ const day=i; return ()=>setDay(day); })();
+    // Day number inside dot
+    const dn = document.createElement('div');
+    dn.className='dot-day-num';
+    dn.textContent=i;
+    dt.appendChild(dn);
+    // Date inside dot
+    const dd2 = document.createElement('div');
+    dd2.className='dot-day-date';
+    const dtObj=getDate(i);
+    dd2.textContent=dtObj.toLocaleDateString('en-IN',{day:'numeric',month:'short'}).replace(' ','\n');
+    dt.appendChild(dd2);
+    // Tooltip
     const tip=document.createElement('div');
     tip.className='dot-tooltip';
-    tip.textContent='Day '+i+(state[dayKey(i)]?' ✓':dd>0?' ('+dd+'/'+dt2+')':'');
+    tip.textContent='Day '+i+' · '+formatDateShort(i)+(state[dayKey(i)]?' ✓':dd>0?' ('+dd+'/'+dt2+')':'');
     dt.appendChild(tip);
     dg.appendChild(dt);
   }
@@ -833,6 +970,7 @@ function render() {
   document.getElementById('pi-focus').textContent = phase.name;
   document.getElementById('pi-session').textContent = session;
   document.getElementById('pi-dayinphase').textContent = (d - phase.range[0]+1)+' of '+(phase.range[1]-phase.range[0]+1);
+  document.getElementById('pi-date').textContent = formatDate(d);
 
   // Tasks
   const ts = document.getElementById('task-section');
@@ -879,4 +1017,3 @@ render();
 </script>
 </body>
 </html>
-HTMLEOF
